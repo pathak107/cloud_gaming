@@ -1,0 +1,11 @@
+{
+    "apps":[
+
+    ],
+    "aws":{
+        "ami_id":"",
+        "instance_type":""
+    },
+    "azure":{},
+    "gcp":{}
+}

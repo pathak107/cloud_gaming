@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<style>
+    div {
+        border: 1px solid black;
+    }
+
+    .resizable-content {
+        min-height: 1278px;
+        min-width: 720px;
+        resize: both;
+        overflow: auto;
+        max-height: fit-content;
+        max-width: fit-content;
+    }
+</style>
+
+<body>
+    <script type="text/javascript" src="node_modules/guacamole-common-js/dist/guacamole-common.min.js"></script>
+    <!-- Display -->
+    <div id="display" class="resizable-content"></div>
+
+    <!-- Init -->
+    <script type="text/javascript"> /* <![CDATA[ */
+
+        // Get display div from document
+        var display = document.getElementById("display");
+        const connectionstring = "eyJpdiI6IndGS3pNSXl4OW5LN1lzRkphRFFQS3c9PSIsInZhbHVlIjoiZDNzeVZnckU0WWFBeXpyUTNZRjZMTFprQXludktZcTJ4VVAxdk1kdUg1UlZjL0gweFRHcUp2OERyOGxqNHU1NWRGZWVDQ0orN2xVN1lGU1ZNSFluWjVjZm1SM2hWdVlGclAxcWRpWjFGMWlZaWtGc0RNVHpHNzNPSDZ1WENmSWdOWm5PVDE3Q1E5TG9hVVBCRkkySkhMNlpvQ0J4QUpJS2lPRXFUYVVaaEFvTGZCYU5uMml6ckdPc1NUZDhhc2NUYTdZVEFERmFXcmd1SmxyUEkwZ2kyc3FSMmZ5UVZqenRrZUxrV3BwT0l6eVFWckswTkhUY3RLOWdVVkMvemJ4Z29WYStMRXpmdlhxSkx4MjRsMDVLbVBQSVFEMXZraFhZQzlEVTJWSDBzY1owdW85VW4yWmZRbWk2UE8xNXdXbjFONGpLTVN1QVU1Y2ZObXFCY21FbXlnPT0ifQ=="
+
+        // Instantiate client, using an HTTP tunnel for communications.
+        var guac = new Guacamole.Client(
+            new Guacamole.WebSocketTunnel('ws://localhost:8080' + '/?token=' + connectionstring + `?&width=${document.document.getElementById("display").clientWidth}&height=${document.getElementById("display").clientHeight}&dpi=64`)
+        );
+
+        // Add client to display div
+        display.appendChild(guac.getDisplay().getElement());
+
+        var keyboard = new Guacamole.Keyboard(document);
+        keyboard.onkeydown = function (keysym) {
+            guac.sendKeyEvent(1, keysym);
+        };
+        keyboard.onkeyup = function (keysym) {
+            guac.sendKeyEvent(0, keysym);
+        };
+
+        var mouse = new Guacamole.Mouse(guac.getDisplay().getElement());
+        mouse.onmousedown =
+            mouse.onmouseup
+            =
+            mouse.onmousemove = function (mouseState) {
+                guac.sendMouseState(mouseState);
+            };
+
+        // Error handler
+        guac.onerror = function (error) {
+            alert(error);
+        };
+
+        // Connect
+        guac.connect();
+
+        // Disconnect on close
+        window.onunload = function () {
+            guac.disconnect();
+        }
+
+        /* ]]> */</script>
+
+</body>
+
+</html>
