@@ -42,3 +42,13 @@ https://github.com/vadimpronin/guacamole-lite
 https://github.com/wwt/guac
 https://github.com/wwt/guac-vue
 https://github.com/vadimpronin/guacamole-lite
+
+# Roadmap
+## Cloud Gaming
+
+## Cloud Rendering 
+Resources:
+- https://www.hindawi.com/journals/ijcgt/2009/231863/
+- https://polystream.com/the-future-of-cloud-gaming-command-streaming-as-the-alternative-to-video-streaming/
+- http://iphome.hhi.de/eisert/papers/sigmap07.pdf
+- https://www.researchgate.net/publication/271769888_LiveRender_A_Cloud_Gaming_System_Based_on_Compressed_Graphics_Streaming
