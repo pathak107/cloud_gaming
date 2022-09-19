@@ -53,7 +53,7 @@ func (a *awsProvider) StopInstance(ctx context.Context, vmID string) error {
 	return nil
 }
 
-func (a *awsProvider) CreateImage(ctx context.Context, imgParam ImageConfig) (string, string, error) {
+func (a *awsProvider) CreateImage(ctx context.Context, imgParam CreateImageParams) (string, string, error) {
 	res, err := a.vm.CreateImage(ctx, &ec2.CreateImageInput{
 		Description: aws.String(imgParam.Description),
 		InstanceId:  aws.String(imgParam.VmID),
@@ -73,7 +73,7 @@ func (a *awsProvider) DeleteImage(ctx context.Context, imageID string) error {
 }
 
 //
-func (a *awsProvider) CreateVM(ctx context.Context, instanceCfg InstanceConfig) (Instance, error) {
+func (a *awsProvider) CreateVM(ctx context.Context, instanceCfg CreateInstanceParams) (Instance, error) {
 	log.Println("Creating ec2")
 	initScript := fmt.Sprintf("#!/bin/bash\nhostnamectl set-hostname %s", instanceCfg.Name)
 	userData := base64.StdEncoding.EncodeToString([]byte(initScript))

@@ -12,10 +12,10 @@ type awsConfig struct {
 	Region      string `json:"region"`
 }
 
-type jsonConfigForApp struct {
-	aws struct {
-		ami_id        string `json:"ami_id"`
-		instance_type string `json:"instance_type"`
+type AppConfigJSON struct {
+	Aws struct {
+		AmiID        string `json:"ami_id"`
+		InstanceType string `json:"instance_type"`
 	} `json:"aws"`
 }
 
@@ -25,7 +25,7 @@ type Instance struct {
 	PrivateIP string
 }
 
-type InstanceConfig struct {
+type CreateInstanceParams struct {
 	Name           string
 	Image          string
 	Hardware       string
@@ -33,14 +33,14 @@ type InstanceConfig struct {
 	PrivateNetwork string
 }
 
-type ImageConfig struct {
+type CreateImageParams struct {
 	VmID        string
 	Name        string
 	Description string
 }
 
 type Cloud interface {
-	LaunchVM(ctx context.Context, instanceCfg InstanceConfig, jsonConfigPath JsonCfgForApp) (*Instance, error)
+	LaunchVM(ctx context.Context, CloudProvider, CloudType, vmName string, appConfigName string) (*Instance, error)
 }
 
 type CloudProvider interface {
@@ -49,8 +49,8 @@ type CloudProvider interface {
 	GetVmsUsage(ctx context.Context, tenantId string) (float64, error)
 	StartInstance(ctx context.Context, vmID string) error
 	StopInstance(ctx context.Context, vmID string) error
-	CreateImage(ctx context.Context, imgParam ImageConfig) (string, string, error)
+	CreateImage(ctx context.Context, imgParam CreateImageParams) (string, string, error)
 	DeleteImage(ctx context.Context, imageID string) error
-	CreateVM(ctx context.Context, instanceCfg InstanceConfig) (Instance, error)
+	CreateVM(ctx context.Context, instanceParams CreateInstanceParams) (Instance, error)
 	ImageId(ctx context.Context, imgName string) (string, error)
 }
