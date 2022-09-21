@@ -4,28 +4,15 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pathak107/cloudesk/pkg/api/controller"
-	"github.com/pathak107/cloudesk/pkg/api/database"
-	"github.com/pathak107/cloudesk/pkg/api/middleware"
-	"github.com/pathak107/cloudesk/pkg/api/service"
+	"github.com/pathak107/cloudesk/pkg/handler"
+	"github.com/pathak107/cloudesk/pkg/middleware"
 )
 
 func main() {
-	//Database setup
-	db, err := database.NewConnection()
+	h, err := handler.NewCloudHandler()
 	if err != nil {
-		log.Fatalf("Database setup failed: %v", err)
+		log.Fatalf("Failed to create handler")
 	}
-
-	//Service Setup
-	userSvc := service.NewUserService(db.Conn)
-	authSvc := service.NewAuthService(db.Conn)
-	catSvc := service.NewCategoryService(db.Conn)
-
-	//Controllers setup
-	userController := controller.NewUserController(userSvc, authSvc)
-	categoryController := controller.NewCategoryController(catSvc)
-
 	// Routes setup
 	r := gin.Default()
 	r.Static("/static", "./public")
@@ -34,9 +21,9 @@ func main() {
 	{
 		vm := v1.Group("/vm")
 		{
-			vm.GET("/", func(ctx *gin.Context) {})      //List of all the Vms under one acc
+			vm.GET("/", func(ctx *gin.Context) {})      //List of all the Vms
 			vm.GET("/:vmID", func(ctx *gin.Context) {}) //Information about a single VM
-			vm.POST("/", func(ctx *gin.Context) {})     //Launch a new VM
+			vm.POST("/", h.LaunchVM)                    //Launch a new VM
 			vm.PUT("/", func(ctx *gin.Context) {})      //action= stop, createImage, take snapshot
 			vm.DELETE("/", func(ctx *gin.Context) {})   //Delete a VM
 
@@ -52,8 +39,8 @@ func main() {
 
 		auth := v1.Group("/auth")
 		{
-			auth.POST("/login", userController.Login)
-			auth.POST("/register", userController.Register)
+			auth.POST("/login", func(ctx *gin.Context) {})
+			auth.POST("/register", func(ctx *gin.Context) {})
 		}
 	}
 

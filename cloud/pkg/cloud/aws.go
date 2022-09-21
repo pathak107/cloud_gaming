@@ -35,9 +35,9 @@ func (a *awsProvider) Status(ctx context.Context, vmID string) (string, error) {
 	return string(status.InstanceStatuses[0].InstanceState.Name.Values()[0]), nil
 }
 
-func (a *awsProvider) GetVmsUsage(ctx context.Context, tenantId string) (float64, error) {
-	return 0, errors.New("not implemented")
-}
+// func (a *awsProvider) GetVmsUsage(ctx context.Context, tenantId string) (float64, error) {
+// 	return 0, errors.New("not implemented")
+// }
 
 func (a *awsProvider) StartInstance(ctx context.Context, vmID string) error {
 	if _, err := a.vm.StartInstances(ctx, &ec2.StartInstancesInput{InstanceIds: []string{vmID}}); err != nil {
@@ -143,6 +143,7 @@ func (a *awsProvider) CreateVM(ctx context.Context, instanceCfg CreateInstancePa
 		VmID:      aws.ToString(ec2InstanceInfo.InstanceId),
 		PublicIP:  aws.ToString(ec2InstanceInfo.PublicIpAddress),
 		PrivateIP: aws.ToString(ec2InstanceInfo.PrivateIpAddress),
+		Name:      instanceCfg.Name,
 	}, nil
 
 }

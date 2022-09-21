@@ -12,17 +12,11 @@ type awsConfig struct {
 	Region      string `json:"region"`
 }
 
-type AppConfigJSON struct {
-	Aws struct {
-		AmiID        string `json:"ami_id"`
-		InstanceType string `json:"instance_type"`
-	} `json:"aws"`
-}
-
 type Instance struct {
 	VmID      string
 	PublicIP  string
 	PrivateIP string
+	Name      string
 }
 
 type CreateInstanceParams struct {
@@ -39,14 +33,10 @@ type CreateImageParams struct {
 	Description string
 }
 
-type Cloud interface {
-	LaunchVM(ctx context.Context, CloudProvider, CloudType, vmName string, appConfigName string) (*Instance, error)
-}
-
 type CloudProvider interface {
 	DestroyVm(ctx context.Context, vmID string) error
 	Status(ctx context.Context, vmID string) (string, error)
-	GetVmsUsage(ctx context.Context, tenantId string) (float64, error)
+	// GetVmsUsage(ctx context.Context, tenantId string) (float64, error)
 	StartInstance(ctx context.Context, vmID string) error
 	StopInstance(ctx context.Context, vmID string) error
 	CreateImage(ctx context.Context, imgParam CreateImageParams) (string, string, error)

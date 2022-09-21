@@ -3,69 +3,46 @@ package cloud
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"io/ioutil"
-)
+	"log"
 
-type CloudType int
-
-const (
-	AWS CloudType = iota
-	GCP
-	AZURE
+	"github.com/pathak107/cloudesk/pkg/utils"
 )
 
 var (
-	AppsConfigBasePath = "/home/pathak107/Documents/webDev/cloudGaming/pkg/cloud/apps_config/"
-	AWSConfigPath      = "/home/pathak107/Documents/webDev/cloudGaming/pkg/cloud/config/aws_config.json"
+	configPathAWS = "/home/pathak107/Documents/webDev/cloudGaming/pkg/cloud/config/aws_config.json"
 )
 
-func NewCloudProvider(cloudType CloudType) (CloudProvider, error) {
-	if cloudType == AWS {
-		var cfg awsConfig
-		configJSON, err := ioutil.ReadFile(AWSConfigPath)
-		if err != nil {
-			return nil, err
-		}
-		err = json.Unmarshal(configJSON, &cfg)
-		if err != nil {
-			return nil, err
-		}
-		return initAWS(context.Background(), cfg)
-	}
-	return nil, errors.New("invalid cloud type specified")
+type CloudService struct {
+	cloud CloudProvider
 }
 
-func CreateInstanceParamsFromAppCfg(cloudType CloudType, appConfigName string) (CreateInstanceParams, error) {
-	var cfg AppConfigJSON
-	appCfgJson, err := ioutil.ReadFile(AppsConfigBasePath + appConfigName + ".json")
+func NewCloudService() (*CloudService, error) {
+	var cfg awsConfig
+	configJSON, err := ioutil.ReadFile(configPathAWS)
 	if err != nil {
-		return CreateInstanceParams{}, err
+		return nil, err
 	}
-
-	err = json.Unmarshal(appCfgJson, &cfg)
+	err = json.Unmarshal(configJSON, &cfg)
 	if err != nil {
-		return CreateInstanceParams{}, err
+		return nil, err
 	}
-
-	if cloudType == AWS {
-		return CreateInstanceParams{
-			Image:    cfg.Aws.AmiID,
-			Hardware: cfg.Aws.InstanceType,
-		}, nil
+	awsProvider, err := initAWS(context.Background(), cfg)
+	if err != nil {
+		return nil, err
 	}
-
-	return CreateInstanceParams{}, errors.New("invalid cloud type specified")
+	return &CloudService{
+		cloud: awsProvider,
+	}, nil
 }
 
-func LaunchVM(ctx context.Context, c CloudProvider, cloudType CloudType, vmName string, appConfigName string) (Instance, error) {
-	cfg, err := CreateInstanceParamsFromAppCfg(cloudType, appConfigName)
+func (c *CloudService) LaunchVM(ctx context.Context, cfg *CreateInstanceParams) (Instance, error) {
+	vm, err := c.cloud.CreateVM(ctx, *cfg)
 	if err != nil {
-		return Instance{}, err
+		log.Println(err)
+		return Instance{}, utils.NewUnexpectedServerError()
 	}
-
-	cfg.Name = vmName
-	return c.CreateVM(ctx, cfg)
+	return vm, nil
 }
 
 // func SetupRDP(ctx context.Context, vm Instance) error {}
