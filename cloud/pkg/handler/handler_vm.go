@@ -34,3 +34,19 @@ func (h *Handler) LaunchVM(ctx *gin.Context) {
 		"data": "vm creation started",
 	})
 }
+
+func (h *Handler) StopVM(ctx *gin.Context) {
+	vmID := ctx.Param("vm_id")
+	err := h.cloudSvc.StopVM(context.Background(), vmID)
+	if err != nil {
+		ctx.Error(err)
+		return
+	}
+
+	//Store information in database about this VM
+	graphql.ChangeStatusOfVM(vmID, "STOPPED")
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"data": "vm stopped",
+	})
+}

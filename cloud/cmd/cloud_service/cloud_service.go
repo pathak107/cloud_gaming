@@ -25,7 +25,8 @@ func main() {
 			vm.GET("/:vmID", func(ctx *gin.Context) {}) //Information about a single VM
 			vm.POST("/", h.LaunchVM)                    //Launch a new VM
 			vm.PUT("/", func(ctx *gin.Context) {})      //action= stop, createImage, take snapshot
-			vm.DELETE("/", func(ctx *gin.Context) {})   //Delete a VM
+			vm.POST("/create_image", func(ctx *gin.Context) {})
+			vm.DELETE("/", func(ctx *gin.Context) {}) //Delete a VM
 
 			vm.GET("/connect", func(ctx *gin.Context) {}) //Returns a token
 			vm.GET("/status", func(ctx *gin.Context) {})  // Polls or SSE for status

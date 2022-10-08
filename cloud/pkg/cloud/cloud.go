@@ -49,6 +49,13 @@ func (c *CloudService) LaunchVM(ctx context.Context, cfg *CreateInstanceParams) 
 
 // func StartRDP(ctx context.Context, vm Instance, rdpType RDPType) error {}
 
-// func StopVM() {}
+func (c *CloudService) StopVM(ctx context.Context, vmID string) error {
+	err := c.cloud.StopInstance(ctx, vmID)
+	if err != nil {
+		log.Println(err)
+		return utils.NewUnexpectedServerError()
+	}
+	return nil
+}
 
 // func TerminateVM() {}
